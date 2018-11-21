@@ -1,5 +1,5 @@
-var path = require('path')
-var webpack = require('webpack')
+var path = require('path');
+var webpack = require('webpack');
 
 module.exports = {
   entry: './src/main.js',
@@ -41,11 +41,13 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      '@': './src'
     },
     extensions: ['*', '.js', '.vue', '.json']
   },
   devServer: {
+    port:8081,
     historyApiFallback: true,
     noInfo: true,
     overlay: true
