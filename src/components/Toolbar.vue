@@ -12,9 +12,9 @@
 
 <style scoped>
 .toolbar{
-  width: 90%;
-  height: 1.6rem;
-  line-height: 1.6rem;
+  width: 98%;
+  height: 2rem;
+  line-height: 2rem;
   background-color: #f5f5f5;
   text-align: left;
   border-radius:0.4rem;

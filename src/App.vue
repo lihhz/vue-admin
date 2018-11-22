@@ -3,7 +3,7 @@
     <header class="header">
       <span class="title">用户管理系统</span>
     </header>
-    <article class="content">
+    <article class="content" :style="{height:dynamicHeight}">
       <aside>
         <nav>
           <ul>
@@ -26,8 +26,12 @@
     name: 'app',
     data() {
       return {
-        msg: 'Welcome to Your Vue.js App'
+        dynamicHeight:'30px'
       }
+    },
+    mounted(){
+      let h = window.innerHeight;
+      this.dynamicHeight = (h-80)+"px";
     }
   }
 </script>
@@ -79,18 +83,18 @@
   }
 
   .menu-title {
-    font-size: 1.0rem;
-    height: 2.5rem;
-    line-height: 2.5rem;
+    font-size: 1.8rem;
+    height: 4rem;
+    line-height: 4rem;
   }
 
   .menu-item > li {
     text-align: left;
     padding-left: 1.2rem;
-
-    height: 1.8rem;
-    line-height: 1.8rem;
-    font-size: 0.8rem;
+    height: 3rem;
+    line-height: 3rem;
+    font-size: 1.4rem;
+    cursor: pointer;
   }
 
   .menu-item > li:before {

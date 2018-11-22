@@ -9,6 +9,7 @@
     <!--:clearChoose="clearChooseTr"-->
     <DataTable :tableData="userList" :tableTitle="tableTitle" @choose="chooseTr">
     </DataTable>
+    <Pagination :pages="pageObj.pages" :total="pageObj.total" :param="{pageSize:15}" :pageclik="initTable"></Pagination>
     <Modal :isShow="addShow" :option='{title:"新增用户",height:"28rem"}' @yes="addModalYes"
            @no="addModalNo">
       <form class="form">
@@ -31,6 +32,7 @@
   import FormInput from '../../components/form/FormInput.vue'
   import FormSelect from '../../components/form/FormSelect.vue'
   import Modal from '../../components/Modal.vue'
+  import Pagination from '../../components/Pagination.vue'
 
   export default {
     name: "SysUser",
@@ -39,11 +41,12 @@
       Toolbar,
       FormInput,
       FormSelect,
-      Modal
+      Modal,Pagination
     },
     data() {
       return {
         // clearChooseTr:false,
+        pageObj : {pages:0,total:0},
 
         tableTitle: {account: '账号', name: '姓名', sex: '性别', email: '电子邮件', mobile: '手机号码', address: '地址'},
         userList: [{}],
@@ -65,15 +68,21 @@
       initTable() {
         let that = this;
         that.$http.post('/sysUser/select', {
-          name: 'xiaoming',
-          info: '12'
+          currentPage: 0,
+          pageSize: 15
         }).then(function (val) {
-          that.userList = val.data;
+          that.userList = val.data.list;
+          that.pageObj.pages = val.data.pages;
         })
       },
 
       chooseTr(val) {
-        this.sysUser = val;
+        //深拷贝，以防止原始数据被更改
+        for(let key in val){
+          if(val.hasOwnProperty(key)){
+            this.sysUser[key] = val[key];
+          }
+        }
       },
 
       add(isUpd) {
@@ -93,8 +102,16 @@
       },
 
       addModalYes() {
-        if (this.sysUser.account === '' || /\s/.test(this.sysUser.account)) {
-          this.$layer.alert('账号不能为空！');
+        if (!/[a-zA-Z0-9]{3,10}/.test(this.sysUser.account)) {
+          this.$layer.msg('账号必须由3~10位字母数字组成！');
+          return;
+        }
+        if(this.sysUser.mobile!=='' && !/1[0-9]{10}/.test(this.sysUser.mobile)){
+          this.$layer.msg('手机号码格式不正确！');
+          return;
+        }
+        if(this.sysUser.email!=='' && !/[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/.test(this.sysUser.email)){
+          this.$layer.msg('电子邮件格式不正确！');
           return;
         }
         let that = this;
@@ -104,8 +121,9 @@
             that.$layer.alert(state.message);
             return;
           }
-          that.$layer.alert('保存成功！');
-          this.whenClose();
+          that.$layer.msg('保存成功！');
+          that.whenClose();
+          that.initTable();
         });
       },
       addModalNo() {

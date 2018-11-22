@@ -68,7 +68,7 @@
   .data-content {
     display: flex;
     flex-direction: column;
-    width: 90%;
+    width: 98%;
   }
 
   .table-caption {
