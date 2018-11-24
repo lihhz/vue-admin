@@ -9,8 +9,8 @@
         <slot></slot>
       </div>
       <div class="modal-footer">
-        <button @click="modalClose('yes')" class="modal-footer-btn modal-footer-yes">确定</button>
-        <button @click="modalClose('no')" class="modal-footer-btn modal-footer-no">取消</button>
+        <button @click="modalClose('yes')" class="btn btn-primary">确定</button>
+        <button @click="modalClose('no')" class="btn btn-default" style="margin-left: 2rem;">取消</button>
       </div>
     </div>
   </div>

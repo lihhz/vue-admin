@@ -1,7 +1,5 @@
 import Vue from 'vue'
-import App from './App.vue'
 import VueRouter from 'vue-router';
-import routes from './router/router.js'
 import axios from 'axios';
 import layer from 'vue-layer'
 
@@ -30,7 +28,7 @@ axios.interceptors.response.use(data => {
   return data;
 }, err => {
   if (err.response && err.response.status) {
-    alert('网络错误！错误代码:'+err.response.status );
+    alert('网络错误！错误代码:' + err.response.status);
   } else {
     alert('未知错误!');
   }
@@ -39,9 +37,7 @@ axios.interceptors.response.use(data => {
 
 Vue.prototype.$http = axios;
 
-let router = new VueRouter({routes});
 new Vue({
   el: '#app',
-  router
-  , render: h => h(App)
+  render: h => h(App)
 });

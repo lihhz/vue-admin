@@ -7,20 +7,15 @@
       <button @click="del">删除</button>
     </Toolbar>
     <!--:clearChoose="clearChooseTr"-->
-    <DataTable :tableData="userList" :tableTitle="tableTitle" @choose="chooseTr" :clearHigh="clearHigh" tableCaption="用户列表">
+    <DataTable :tableData="roleList" :tableTitle="tableTitle" @choose="chooseTr" :clearHigh="clearHigh" tableCaption="角色列表">
     </DataTable>
     <Pagination :pages="pageObj.pages" :total="pageObj.total" :param="queryParam" @pageclik="initTable"></Pagination>
-    <Modal :isShow="addShow" :option='{title:"新增用户",height:"28rem"}' @yes="addModalYes"
+    <Modal :isShow="addShow" :option='{title:"新增角色",height:"20rem"}' @yes="addModalYes"
            @no="addModalNo">
       <form class="form">
-        <FormInput iptLabel="账号" itemWidth="48%" :inline="true" v-model="sysUser.account"></FormInput>
-        <FormInput iptLabel="姓名" itemWidth="48%" :inline="true" v-model="sysUser.name"></FormInput>
-        <FormSelect iptLabel="性别" itemWidth="48%" :inline="true" v-model="sysUser.sex"
-                    :optionArr="[{key:'0',value:'女'},{key:'1',value:'男'}]"></FormSelect>
-        <FormInput iptLabel="email" itemWidth="48%" :inline="true" v-model="sysUser.email"></FormInput>
-        <FormInput iptLabel="手机号码" itemWidth="48%" :inline="true" v-model="sysUser.mobile"></FormInput>
-        <FormInput iptLabel="家庭地址" itemWidth="48%" :inline="true" v-model="sysUser.address"></FormInput>
-        <FormInput iptLabel="个人描述" itemWidth="98%" :inline="true" v-model="sysUser.description"></FormInput>
+        <FormInput iptLabel="编码" itemWidth="48%" :inline="true" v-model="sysRole.code"></FormInput>
+        <FormInput iptLabel="名称" itemWidth="48%" :inline="true" v-model="sysRole.name"></FormInput>
+        <FormInput iptLabel="描述" itemWidth="98%" :inline="true" v-model="sysRole.description"></FormInput>
       </form>
     </Modal>
   </div>
@@ -28,14 +23,14 @@
 
 <script>
   import DataTable from '../../components/DataTable.vue'
-  import Toolbar from '../../components/Toolbar.vue'
   import FormInput from '../../components/form/FormInput.vue'
+  import Toolbar from '../../components/Toolbar.vue'
   import FormSelect from '../../components/form/FormSelect.vue'
   import Modal from '../../components/Modal.vue'
   import Pagination from '../../components/Pagination.vue'
 
   export default {
-    name: "SysUser",
+    name: "SysRole",
     components: {
       DataTable,
       Toolbar,
@@ -51,18 +46,14 @@
         pageObj: {pages: 0, total: 0},
         queryParam: {pageSize: 10, currentPage: 1},
 
-        tableTitle: {account: '账号', name: '姓名', sex: '性别', email: '电子邮件', mobile: '手机号码', address: '地址'},
-        userList: [{}],
+        tableTitle: {code: '编码', name: '名称', description: '描述'},
+        roleList: [{}],
 
         addShow: 'none',
-        sysUser: {
+        sysRole: {
           id: '',
-          account: '',
+          code: '',
           name: '',
-          email: '',
-          mobile: '',
-          sex: '',
-          address: '',
           description: '',
         },
       }
@@ -75,8 +66,8 @@
         }
         console.log('pageSize', this.queryParam.pageSize);
         let that = this;
-        that.$http.post('/sysUser/select', that.queryParam).then(function (val) {
-          that.userList = val.data.list;
+        that.$http.post('/sysRole/select', that.queryParam).then(function (val) {
+          that.roleList = val.data.list;
           that.pageObj.pages = val.data.pages;
           that.pageObj.total = val.data.total;
         }).catch(function (e) {
@@ -89,9 +80,9 @@
         //归位
         if(!val){
           this.clearHigh = false;
-          for (let key in this.sysUser) {
+          for (let key in this.sysRole) {
             if (val.hasOwnProperty(key)) {
-              this.sysUser[key] = '';
+              this.sysRole[key] = '';
             }
           }
           return;
@@ -99,20 +90,20 @@
         //深拷贝，以防止原始数据被更改
         for (let key in val) {
           if (val.hasOwnProperty(key)) {
-            this.sysUser[key] = val[key];
+            this.sysRole[key] = val[key];
           }
         }
       },
 
       add(isUpd) {
         if (!isUpd) {
-          for (let key in this.sysUser) {
-            if (this.sysUser.hasOwnProperty(key)) {
-              this.sysUser[key] = '';
+          for (let key in this.sysRole) {
+            if (this.sysRole.hasOwnProperty(key)) {
+              this.sysRole[key] = '';
             }
           }
         } else {
-          if (this.sysUser.id === '') {
+          if (this.sysRole.id === '') {
             this.$layer.alert('请选择要修改的记录！');
             return;
           }
@@ -121,20 +112,20 @@
       },
       del() {
         let layer = this.$layer, that = this;
-        if (this.sysUser.id === '') {
+        if (this.sysRole.id === '') {
           layer.msg('请选择要修改的记录！');
           return;
         }
 
         let index = layer.open({
-          type: 0, title: '删除用户',
-          content: '确定删除用户【' + this.sysUser.account + '】？',
+          type: 0, title: '删除角色',
+          content: '确定删除角色【' + this.sysRole.code + '】？',
           icon: -1,
           btn: '确定',
           time: 0,
           shade: true,//是否显示遮罩
           yes: function () {
-            that.$http.post('/sysUser/del', that.sysUser).then(function (val) {
+            that.$http.post('/sysRole/del', that.sysRole).then(function (val) {
               if (val.data.success) {
                 layer.msg('删除成功！');
                 that.initTable();
@@ -148,7 +139,7 @@
             layer.close(index);
           },
         });
-        // this.$layer.confirm('确定删除用户【' + this.sysUser.account + '】？', {
+        // this.$layer.confirm('确定删除角色【' + this.sysRole.code + '】？', {
         //   yes:function () {
         //     alert(1);
         //   },
@@ -159,20 +150,12 @@
       },
 
       addModalYes() {
-        if (!/[a-zA-Z0-9]{3,10}/.test(this.sysUser.account)) {
-          this.$layer.msg('账号必须由3~10位字母数字组成！');
-          return;
-        }
-        if (this.sysUser.mobile !== '' && !/1[0-9]{10}/.test(this.sysUser.mobile)) {
-          this.$layer.msg('手机号码格式不正确！');
-          return;
-        }
-        if (this.sysUser.email !== '' && !/[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/.test(this.sysUser.email)) {
-          this.$layer.msg('电子邮件格式不正确！');
+        if (!/[a-zA-Z0-9]{3,10}/.test(this.sysRole.code)) {
+          this.$layer.msg('编码必须由3~10位字母数字组成！');
           return;
         }
         let that = this;
-        that.$http.post('/sysUser/save', that.sysUser).then(function (res) {
+        that.$http.post('/sysRole/save', that.sysRole).then(function (res) {
           let state = res.data;
           if (!state.success) {
             that.$layer.alert(state.message);
@@ -223,10 +206,4 @@
     cursor: text;
     transition: border .2s ease-in-out, background .2s ease-in-out, box-shadow .2s ease-in-out;
   }
-
-  /*.add-user  input {*/
-  /*border: 0.1rem solid lightgray;*/
-  /*border-radius: 0.2rem;*/
-  /*outline: none;*/
-  /*}*/
 </style>

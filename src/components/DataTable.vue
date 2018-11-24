@@ -1,17 +1,24 @@
 <template>
   <div class="data-content">
-    <span class="table-caption">用户列表</span>
+    <span v-if="tableCaption && tableCaption !== ''" class="table-caption">{{ tableCaption}}</span>
     <div class="data-table-content">
       <table>
         <thead>
         <tr>
+          <th v-if="!!checkKey">请选择</th>
           <th v-for="(val,key) in tableTitle" :key="key">
             {{val}}
           </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody ref="mybox">
         <tr v-for="obj in tableData" @click="_cos(obj,$event)">
+          <td v-if="!!checkKey" style="text-align: center">
+            <input type="checkbox" v-model='checkValArr.indexOf(obj[checkKey]) > -1' @click.stop="checkClick($event,obj)"/>
+          </td>
+          <!--<td v-if="!!trCheck">-->
+          <!--<input type="checkbox" v-model='!!trCheck.valArr && trCheck.valArr.indexOf(obj[trCheck.key]) > -1'/>-->
+          <!--</td>-->
           <td v-for="(val,key) in tableTitle" :key="key">
             {{obj[key]}}
           </td>
@@ -26,20 +33,31 @@
   export default {
     name: "data-table-content",
     props: {
-      // clearChoose: {
-      //   type: Boolean,
-      //   require: true
-      // },
+      //关于多选框的事件
+      checkKey: String,
+      checkValArr:Array,
+
+      //table标题
+      tableCaption: String,
+
+      //清除高亮
+      clearHigh: Boolean,
+
+      //表格数据
       tableData: {
         type: Array,
         require: false
       },
+
+      //表头
       tableTitle: {
         type: Object,
         require: true
       }
     },
     methods: {
+
+      //行选中事件
       _cos(obj, ev) {
         let target = ev.srcElement || ev.target;
         if (target.tagName.toLowerCase() === 'td') {
@@ -51,16 +69,26 @@
         });
         target.style.background = 'yellow';
         this.$emit('choose', obj);
+      },
+
+      //checkbox点击事件
+      checkClick(ev,roleObj){
+        this.$emit('checkClick',roleObj,ev.target.checked);
       }
     },
 
-    // watch:{
-    //   clearChoose:function (newVal,oldVal) {
-    //     if(newVal === true){
-    //
-    //     }
-    //   }
-    // }
+    watch: {
+      //清除行选中事件
+      clearHigh: function (newVal, oldVal) {
+        if (newVal === true) {
+          let trs = Array.from(this.$refs.mybox.children);
+          trs.forEach(function (val) {
+            val.style.background = 'transparent';
+          });
+          this.$emit('choose', null);
+        }
+      }
+    }
   }
 </script>
 
